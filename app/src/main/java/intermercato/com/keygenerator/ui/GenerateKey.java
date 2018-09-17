@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,8 +59,6 @@ import intermercato.com.keygenerator.utils.DataHandler;
 import intermercato.com.keygenerator.utils.QRCodeEncoder;
 
 
-
-
 public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMetricsListener {
 
 
@@ -83,6 +82,9 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
     private PrintJobData printJobData;
     private PrintAttributes.MediaSize mediaSize5x7;
 
+    private ImageButton btnPrint;
+    private Bitmap theImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,18 +107,19 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        //NEEDED FOR ANDROID 7 > users to update application
+
         if (Build.VERSION.SDK_INT >= 24) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
 
 
-        Button b = findViewById(R.id.btnTemp);
-        b.setOnClickListener(new View.OnClickListener() {
+        btnPrint = findViewById(R.id.btnTemp);
+        btnPrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 continueButtonClicked(v);
+                v.setVisibility(View.INVISIBLE);
             }
         });
         qrImage = findViewById(R.id.qrImage);
@@ -125,7 +128,7 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         fab.setOnClickListener(view -> {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-           generateCostumerKey();
+            generateCostumerKey();
 
 /*
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -164,7 +167,7 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
                     ImageAsset.MeasurementUnits.INCHES,
                     widthInches, heightInches);
 
-            Log.d("Generate", "width " + width + "   height " + height+"   "+userPickedUri);
+            Log.d("Generate", "width " + width + "   height " + height + "   " + userPickedUri);
 
             PrintItem printItem4x6 = new ImagePrintItem(PrintAttributes.MediaSize.NA_INDEX_4X6, margins, scaleType, imageAsset);
             PrintItem printItem85x11 = new ImagePrintItem(PrintAttributes.MediaSize.NA_LETTER, margins, scaleType, imageAsset);
@@ -257,7 +260,6 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         return UUID.randomUUID().toString();
     }
 
-    private Bitmap theImage;
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -274,55 +276,60 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         display.getSize(point);
         int width = point.x;
         int height = point.y;
+        Log.d("Generate","w "+width+"   h "+height);
         int smallerDimension = width < height ? width : height;
-        smallerDimension = smallerDimension * 3 / 4;
 
+        smallerDimension = smallerDimension * 3 / 4;
+        Log.d("Generate","smallerDimension "+smallerDimension);
         //Encode with a QR Code image
         QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(str,
                 null,
                 Contents.Type.TEXT,
                 BarcodeFormat.QR_CODE.toString(),
                 smallerDimension);
+
+        Bitmap bitmap = null;
         try {
-            Bitmap bitmap = qrCodeEncoder.encodeAsBitmap();
-
-            theImage = bitmap;
+            bitmap = qrCodeEncoder.encodeAsBitmap();
             qrImage.setImageBitmap(bitmap);
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        userPickedUri = getImageUri(this, bitmap);
+
+        Log.d("Generate", "getUri " + userPickedUri);
+
+        if (userPickedUri != null) {
+            btnPrint.setVisibility(View.VISIBLE);
         }
     }
 
     public void continueButtonClicked(View v) {
 
 
-        Log.d("Generate","getUri "+getImageUri(this,theImage));
-        userPickedUri = getImageUri(this,theImage);
-
         createPrintJobData();
         PrintUtil.setPrintJobData(printJobData);
-        // createCustomData();
-        // PrintUtil.sendPrintMetrics = showMetricsDialog;
+
+        PrintUtil.sendPrintMetrics = showMetricsDialog;
         PrintUtil.print(this);
 
     }
 
     private void createPrintJobData() {
 
-        Log.d("Generate", "1 --------> "+userPickedUri);
+        Log.d("Generate", "1 --------> " + userPickedUri);
 
 
         if (userPickedUri != null && getMimeType(userPickedUri).startsWith(MIME_TYPE_IMAGE_PREFIX) && contentType == CONTENT_TYPE_IMAGE) {
             Log.d("Generate", "1 -------->");
 
-        }else if (userPickedUri != null && getMimeType(userPickedUri).equals(MIME_TYPE_PDF) && contentType == CONTENT_TYPE_PDF) {
+        } else if (userPickedUri != null && getMimeType(userPickedUri).equals(MIME_TYPE_PDF) && contentType == CONTENT_TYPE_PDF) {
             Log.d("Generate", "2 -------->");
 
 
-        }else{
+        } else {
             Log.d("Generate", "3 -------->");
 
         }

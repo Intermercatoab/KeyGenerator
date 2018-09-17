@@ -63,12 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btnStoredKeys :
-/*
 
                 Intent intentStoredKeys = new Intent(MainActivity.this, Storedkeys.class);
                 startActivity(intentStoredKeys);
-*/
-                startActivity(new Intent(MainActivity.this, MainActivity2.class) );
 
                 break;
 

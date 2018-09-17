@@ -38,10 +38,6 @@
         android:label="@string/title_activity_storedkeys"
         android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity
-            android:name=".MainActivity2"
-            android:label="jadå"
-            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
