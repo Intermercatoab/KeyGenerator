@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">KeyGenerator</string>
+    <string name="title_activity_generate_key">GenerateKey</string>
+    <string name="title_activity_validate_key">ValidateKey</string>
+    <string name="txtAddScaleId">Add scale ID to generate customer key</string>
+    <string name="title_activity_storedkeys">Storedkeys</string>
+    <string name="title_customer_generated_key">Generated customer key</string>
+    <string name="print_settings">PRINT SETTINGS</string>
+    <string name="printing_help">PRINTING HELP</string>
+</resources>
