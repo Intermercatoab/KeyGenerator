@@ -7,4 +7,6 @@
     <string name="title_customer_generated_key">Generated customer key</string>
     <string name="print_settings">PRINT SETTINGS</string>
     <string name="printing_help">PRINTING HELP</string>
+    <string name="txt_save_customer_qr">SAVE QR</string>
+    <string name="txt_generate_qr">GENERATE QR</string>
 </resources>
