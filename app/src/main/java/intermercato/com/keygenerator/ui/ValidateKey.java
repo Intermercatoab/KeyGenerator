@@ -32,6 +32,8 @@ public class ValidateKey extends AppCompatActivity implements ScannerLiveView.Sc
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -48,6 +50,12 @@ public class ValidateKey extends AppCompatActivity implements ScannerLiveView.Sc
         txtValid = findViewById(R.id.txtValid);
         scannerLiveView = findViewById(R.id.scanner);
         scannerLiveView.setScannerViewEventListener(this);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override

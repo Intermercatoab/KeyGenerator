@@ -9,4 +9,7 @@
     <string name="printing_help">PRINTING HELP</string>
     <string name="txt_save_customer_qr">SAVE QR</string>
     <string name="txt_generate_qr">GENERATE QR</string>
+    <string name="txt_save_customer_qr_msg">QR customer key will be saved to database.</string>
+    <string name="txt_saving_customer_qr_to_database">Qr saved to database</string>
+    <string name="txt_save_qr">Save qr</string>
 </resources>

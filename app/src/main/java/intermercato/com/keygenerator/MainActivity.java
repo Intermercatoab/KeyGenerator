@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import intermercato.com.keygenerator.ui.GenerateKey;
+import intermercato.com.keygenerator.ui.generate.GenerateKey;
 import intermercato.com.keygenerator.ui.Storedkeys;
 import intermercato.com.keygenerator.ui.ValidateKey;
 

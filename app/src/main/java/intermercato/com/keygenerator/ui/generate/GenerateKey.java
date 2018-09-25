@@ -1,8 +1,8 @@
-package intermercato.com.keygenerator.ui;
+package intermercato.com.keygenerator.ui.generate;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,9 +17,10 @@ import android.os.StrictMode;
 import android.print.PrintAttributes;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.CoordinatorLayout;
+
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -33,7 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 
 import com.google.zxing.BarcodeFormat;
@@ -46,21 +47,22 @@ import com.hp.mss.hpprint.util.PrintUtil;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.UUID;
+
+
 
 import intermercato.com.keygenerator.R;
 import intermercato.com.keygenerator.utils.AESEnDecryption;
 
+import intermercato.com.keygenerator.utils.Constants;
 import intermercato.com.keygenerator.utils.Contents;
 import intermercato.com.keygenerator.utils.DataHandler;
 import intermercato.com.keygenerator.utils.QRCodeEncoder;
 
 
-public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMetricsListener {
+public class GenerateKey extends AppCompatActivity implements GenerateQrContract.View, PrintUtil.PrintMetricsListener, View.OnClickListener {
 
 
     static final int PICKFILE_RESULT_CODE = 1;
@@ -78,7 +80,7 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
     private String contentType = CONTENT_TYPE_IMAGE;
     private String error;
     boolean showMetricsDialog;
-    private Uri userPickedUri;
+    private Uri bitmapUri;
     private PrintItem.ScaleType scaleType;
     private PrintAttributes.Margins margins;
     private PrintJobData printJobData;
@@ -87,7 +89,8 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
     private Button btnGenerateQR;
     private ImageButton btnPrint;
     private Bitmap theImage;
-    private FloatingActionButton fab;
+    private CoordinatorLayout coordinator;
+    private GenerateQrContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,48 +98,31 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         setContentView(R.layout.activity_generate_key);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //btnGenerateQR.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_help_icon));
+
+
+        presenter = new GenerateQrPresenter(this);
+
+        /* Get Windows manager for screen width and height */
+        WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Display display = manager.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        int width = point.x;
+        int height = point.y;
+        Log.d("Generate", "w " + width + "   h " + height);
+        int smallerDimension = width < height ? width : height;
+
+        smallerDimension = smallerDimension * 3 / 4;
+        Log.d("Generate", "smallerDimension " + smallerDimension);
+        presenter.doSetMeasure(width,height);
+
         btnGenerateQR = findViewById(R.id.btnGenerateQR);
-        btnGenerateQR.setOnClickListener(v -> {
-
-            Log.d("Generare", "state " + v.getTag());
-            if (v.getTag() == null || !v.getTag().toString().equalsIgnoreCase(STATE_READY_TO_SAVE)) {
-
-                generateCostumerKey();
-                v.setTag(STATE_READY_TO_SAVE);
-                btnGenerateQR.setText(getString(R.string.txt_save_customer_qr));
-
-            } else {
-                new AlertDialog.Builder(this)
-                        .setTitle("Save QR")
-                        .setMessage("QRcode will be saved to database.")
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Snackbar.make(fab, "QR saved", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-                                btnGenerateQR.setText(R.string.txt_generate_qr);
-                                v.setTag(null);
-                                qrImage.setImageBitmap(null);
-                                hideTextFields(false);
-                            }
-                        })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                v.setTag(null);
-                                btnGenerateQR.setText(R.string.txt_generate_qr);
-                                qrImage.setImageBitmap(null);
-                                hideTextFields(false);
-                            }
-                        })
-                        .show();
-
-            }
-
-
-        });
+        btnGenerateQR.setOnClickListener(this);
+        coordinator = findViewById(R.id.coordinator);
 
         txtScaleId = findViewById(R.id.txtScaleId);
         txtCustomerKey = findViewById(R.id.txtGeneratedCustomerKey);
@@ -155,20 +141,14 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
 
 
         btnPrint = findViewById(R.id.btnPrint);
-        btnPrint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                continueButtonClicked(v);
-                v.setVisibility(View.INVISIBLE);
-            }
-        });
+        btnPrint.setOnClickListener(this);
+
         qrImage = findViewById(R.id.qrImage);
 
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener((View view) -> {
+/*
+
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-
 
 
             showMetricsDialog = true;
@@ -176,23 +156,32 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
             contentType = "Image";
             margins = new PrintAttributes.Margins(0, 0, 0, 0);
 
-           /* Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType(getContentMimeType());
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICKFILE_RESULT_CODE);*/
-
-
-        });
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICKFILE_RESULT_CODE);
+*/
 
         mediaSize5x7 = new PrintAttributes.MediaSize("na_5x7_5x7in", "5 x 7", 5000, 7000);
     }
 
+    private void DoSnack(String msg){
+        if(coordinator == null) return;
+
+        Snackbar.make(coordinator, msg, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 
     private void createUserSelectedImageJobData() {
 
         Bitmap userPickedBitmap;
 
         try {
-            userPickedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), userPickedUri);
+            userPickedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), bitmapUri);
             int width = userPickedBitmap.getWidth();
             int height = userPickedBitmap.getHeight();
             // if user picked bitmap is too big, just reduce the size, so it will not chock the print plugin
@@ -207,19 +196,16 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
             Log.d("Generate", "width " + width + "   height " + height + "   ");
 
             DisplayMetrics mDisplayMetric = getResources().getDisplayMetrics();
-            float widthInches = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_IN, width, mDisplayMetric);
+            float widthInches =  TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_IN, width, mDisplayMetric);
             float heightInches = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_IN, height, mDisplayMetric);
 
-            ImageAsset imageAsset = new ImageAsset(this,
-                    userPickedBitmap,
-                    ImageAsset.MeasurementUnits.INCHES,
-                    widthInches, heightInches);
+            ImageAsset imageAsset = new ImageAsset(this, userPickedBitmap, ImageAsset.MeasurementUnits.INCHES, widthInches, heightInches);
 
-            Log.d("Generate", "width " + widthInches + "   height " + heightInches + "   " + userPickedUri);
+            Log.d("Generate", "width " + widthInches + "   height " + heightInches + "   " + bitmapUri);
 
-            PrintItem printItem4x6 = new ImagePrintItem(PrintAttributes.MediaSize.NA_INDEX_4X6, margins, scaleType, imageAsset);
+            PrintItem printItem4x6   = new ImagePrintItem(PrintAttributes.MediaSize.NA_INDEX_4X6, margins, scaleType, imageAsset);
             PrintItem printItem85x11 = new ImagePrintItem(PrintAttributes.MediaSize.NA_LETTER, margins, scaleType, imageAsset);
-            PrintItem printItem5x7 = new ImagePrintItem(mediaSize5x7, margins, scaleType, imageAsset);
+            PrintItem printItem5x7   = new ImagePrintItem(mediaSize5x7, margins, scaleType, imageAsset);
 
 
             printJobData = new PrintJobData(this, printItem4x6);
@@ -229,7 +215,6 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -244,23 +229,24 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         switch (requestCode) {
             case PICKFILE_RESULT_CODE:
                 if (resultCode == Activity.RESULT_OK) {
-                    userPickedUri = data.getData();
-                    showFileInfo(userPickedUri);
+                    bitmapUri = data.getData();
+                    showFileInfo(bitmapUri);
                 }
                 break;
         }
     }
 
     private void showFileInfo(Uri uri) {
-        Cursor returnCursor = getContentResolver().query(uri, null, null, null, null);
 
+        Cursor returnCursor = getContentResolver().query(uri, null, null, null, null);
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
 
-//        Log.d("Generate", " "+returnCursor.getString(nameIndex) +"  "+ Long.toString(returnCursor.getLong(sizeIndex)));
         returnCursor.moveToFirst();
-        Log.d("Generate", "userPickedUri " + userPickedUri);
-        Log.d("Generate", "File " + returnCursor.getString(nameIndex) + "(" + Long.toString(returnCursor.getLong(sizeIndex)) + "0");
+
+        Log.d("Generate", "              " + returnCursor.getString(nameIndex) +"  "+ Long.toString(returnCursor.getLong(sizeIndex)));
+        Log.d("Generate", "bitmapUri " + bitmapUri);
+        Log.d("Generate", "File          " + returnCursor.getString(nameIndex) + "(" + Long.toString(returnCursor.getLong(sizeIndex)) + "0");
 
     }
 
@@ -305,17 +291,10 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         txtCustomerKey.setText(customerKey);
     }
 
-    private String generateKey() {
-        return UUID.randomUUID().toString();
-    }
 
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
+
+
 
     private void generateBitMapQrImage(String str) {
 
@@ -346,11 +325,11 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
             e.printStackTrace();
         }
 
-        userPickedUri = getImageUri(this, bitmap);
+        //bitmapUri = getImageUri(this, bitmap);
 
-        Log.d("Generate", "getUri " + userPickedUri);
+        Log.d("Generate", "getUri " + bitmapUri);
 
-        if (userPickedUri != null) {
+        if (bitmapUri != null) {
             btnPrint.setVisibility(View.VISIBLE);
         }
     }
@@ -368,20 +347,17 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
 
     private void createPrintJobData() {
 
-        Log.d("Generate", "1 --------> " + userPickedUri);
+        Log.d("Generate", "1 --------> " + bitmapUri);
 
 
-        if (userPickedUri != null && getMimeType(userPickedUri).startsWith(MIME_TYPE_IMAGE_PREFIX) && contentType == CONTENT_TYPE_IMAGE) {
+        if (bitmapUri != null && getMimeType(bitmapUri).startsWith(MIME_TYPE_IMAGE_PREFIX) && contentType == CONTENT_TYPE_IMAGE) {
             Log.d("Generate", "1 -------->");
-
-        } else if (userPickedUri != null && getMimeType(userPickedUri).equals(MIME_TYPE_PDF) && contentType == CONTENT_TYPE_PDF) {
+        } else if (bitmapUri != null && getMimeType(bitmapUri).equals(MIME_TYPE_PDF) && contentType == CONTENT_TYPE_PDF) {
             Log.d("Generate", "2 -------->");
-
-
         } else {
             Log.d("Generate", "3 -------->");
-
         }
+
         createUserSelectedImageJobData();
         //Giving the print job a name.
         printJobData.setJobName("Example");
@@ -390,6 +366,7 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         PrintAttributes printAttributes = new PrintAttributes.Builder()
                 .setMediaSize(PrintAttributes.MediaSize.NA_LETTER)
                 .build();
+
         printJobData.setPrintDialogOptions(printAttributes);
 
     }
@@ -421,5 +398,88 @@ public class GenerateKey extends AppCompatActivity implements PrintUtil.PrintMet
         builder.setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
         builder.create().show();
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+
+            case R.id.btnGenerateQR :
+
+
+                    Log.d("Generate", "state " + v.getTag());
+                    if (v.getTag() == null || !v.getTag().toString().equalsIgnoreCase(STATE_READY_TO_SAVE)) {
+
+                        presenter.doGenerateQr( txtScaleId.getText().toString() );
+                        //generateCostumerKey();
+                        v.setTag(STATE_READY_TO_SAVE);
+                        btnGenerateQR.setText(getString(R.string.txt_save_customer_qr));
+                        hideTextFields(true);
+
+                    } else {
+                        new AlertDialog.Builder(this)
+                                .setTitle(getString(R.string.txt_save_qr))
+                                .setMessage(getString(R.string.txt_save_customer_qr_msg))
+                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DoSnack(getString(R.string.txt_saving_customer_qr_to_database));
+                                        btnGenerateQR.setText(R.string.txt_generate_qr);
+                                        v.setTag(null);
+                                        qrImage.setImageBitmap(null);
+                                        hideTextFields(false);
+
+                                    }
+                                })
+                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        v.setTag(null);
+                                        btnGenerateQR.setText(R.string.txt_generate_qr);
+                                        qrImage.setImageBitmap(null);
+                                        hideTextFields(false);
+                                    }
+                                })
+                                .show();
+                    }
+
+                break;
+
+            case R.id.btnPrint :
+
+                continueButtonClicked(v);
+                v.setVisibility(View.INVISIBLE);
+
+                break;
+
+        }
+    }
+
+    @Override
+    public void Message(int t, String s) {
+
+        switch (t){
+            case Constants.SUCCESS_MSG :
+
+
+                break;
+
+            case Constants.ERROR_MSG :
+
+
+                break;
+        }
+
+    }
+
+    @Override
+    public void SetBitmap(Bitmap bitmap) {
+        qrImage.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void SetBitMapUri(Uri uri) {
+        bitmapUri = uri;
     }
 }
