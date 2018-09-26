@@ -3,7 +3,7 @@ package intermercato.com.keygenerator.ui.generate;
 import android.app.Activity;
 import android.app.AlertDialog;
 
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -36,8 +36,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-
-import com.google.zxing.BarcodeFormat;
 import com.hp.mss.hpprint.model.ImagePrintItem;
 import com.hp.mss.hpprint.model.PrintItem;
 import com.hp.mss.hpprint.model.PrintJobData;
@@ -46,20 +44,19 @@ import com.hp.mss.hpprint.model.asset.ImageAsset;
 import com.hp.mss.hpprint.util.PrintUtil;
 
 
-import java.io.ByteArrayOutputStream;
-
 
 import java.io.IOException;
 
 
 
 import intermercato.com.keygenerator.R;
-import intermercato.com.keygenerator.utils.AESEnDecryption;
 
+
+import intermercato.com.keygenerator.models.CustomerKey;
 import intermercato.com.keygenerator.utils.Constants;
-import intermercato.com.keygenerator.utils.Contents;
-import intermercato.com.keygenerator.utils.DataHandler;
-import intermercato.com.keygenerator.utils.QRCodeEncoder;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 
 
 public class GenerateKey extends AppCompatActivity implements GenerateQrContract.View, PrintUtil.PrintMetricsListener, View.OnClickListener {
@@ -92,6 +89,9 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
     private CoordinatorLayout coordinator;
     private GenerateQrContract.Presenter presenter;
 
+    Realm realm;
+    RealmChangeListener<RealmResults<CustomerKey>> listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +103,14 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
 
         //btnGenerateQR.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_help_icon));
 
+        realm = Realm.getDefaultInstance();
+        RealmResults<CustomerKey> customerKeys = realm.where(CustomerKey.class).findAllAsync();
+        listener = c -> {
+            Log.d("DataBase","size "+c.size());
+        };
 
+
+        customerKeys.addChangeListener(listener);
         presenter = new GenerateQrPresenter(this);
 
         /* Get Windows manager for screen width and height */
@@ -259,81 +266,6 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
         return mimeType;
     }
 
-    private void generateCostumerKey() {
-
-        String genKey = "e6980bc3-7378-4e95-8e92-3ffd18a8a41d"; //generateKey();
-        String scaleId = txtScaleId.getText().toString();
-        String customerKey = "";
-
-        Log.d("Generate", "genKey: " + genKey + "\nScaleId: " + scaleId + "IvStr: " + DataHandler.IVSTR);
-
-        if (scaleId.length() < 2) {
-            error = "Scale ID can't be empty or less that four characters";
-            Log.d("Generate", "error " + error);
-            return;
-        }
-
-        hideTextFields(true);
-
-        // ENCRYPT KEY
-
-        try {
-            Log.d("Generate", "Before Encrypt: " + genKey);
-            customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, scaleId, genKey);
-            Log.d("Generate", "After Encrypt: " + customerKey);
-
-            generateBitMapQrImage(customerKey);
-
-        } catch (Exception e) {
-
-        }
-
-        txtCustomerKey.setText(customerKey);
-    }
-
-
-
-
-
-
-    private void generateBitMapQrImage(String str) {
-
-        WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        Display display = manager.getDefaultDisplay();
-        Point point = new Point();
-        display.getSize(point);
-        int width = point.x;
-        int height = point.y;
-        Log.d("Generate", "w " + width + "   h " + height);
-        int smallerDimension = width < height ? width : height;
-
-        smallerDimension = smallerDimension * 3 / 4;
-        Log.d("Generate", "smallerDimension " + smallerDimension);
-        //Encode with a QR Code image
-        QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(str,
-                null,
-                Contents.Type.TEXT,
-                BarcodeFormat.QR_CODE.toString(),
-                width);
-
-        Bitmap bitmap = null;
-        try {
-            bitmap = qrCodeEncoder.encodeAsBitmap();
-            qrImage.setImageBitmap(bitmap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //bitmapUri = getImageUri(this, bitmap);
-
-        Log.d("Generate", "getUri " + bitmapUri);
-
-        if (bitmapUri != null) {
-            btnPrint.setVisibility(View.VISIBLE);
-        }
-    }
-
     public void continueButtonClicked(View v) {
 
 
@@ -407,41 +339,36 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
 
             case R.id.btnGenerateQR :
 
-
                     Log.d("Generate", "state " + v.getTag());
                     if (v.getTag() == null || !v.getTag().toString().equalsIgnoreCase(STATE_READY_TO_SAVE)) {
 
-                        presenter.doGenerateQr( txtScaleId.getText().toString() );
+                        presenter.doGenerateQr(txtScaleId.getText().toString());
                         //generateCostumerKey();
                         v.setTag(STATE_READY_TO_SAVE);
-                        btnGenerateQR.setText(getString(R.string.txt_save_customer_qr));
+
                         hideTextFields(true);
 
-                    } else {
+                        btnGenerateQR.setVisibility(View.INVISIBLE);
+
+
                         new AlertDialog.Builder(this)
                                 .setTitle(getString(R.string.txt_save_qr))
                                 .setMessage(getString(R.string.txt_save_customer_qr_msg))
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        DoSnack(getString(R.string.txt_saving_customer_qr_to_database));
-                                        btnGenerateQR.setText(R.string.txt_generate_qr);
-                                        v.setTag(null);
-                                        qrImage.setImageBitmap(null);
-                                        hideTextFields(false);
+                                .setPositiveButton("YES", (dialog, which) -> {
+                                    presenter.doAskUserBeforeSaving(true);
+                                    v.setTag(null);
 
-                                    }
+                                    qrImage.setImageBitmap(null);
+                                    hideTextFields(false);
                                 })
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        v.setTag(null);
-                                        btnGenerateQR.setText(R.string.txt_generate_qr);
-                                        qrImage.setImageBitmap(null);
-                                        hideTextFields(false);
-                                    }
+                                .setNegativeButton("NO", (dialog, which) -> {
+                                    v.setTag(null);
+                                    DoSnack(getString(R.string.txt_qr_didnt_get_saved));
+                                    qrImage.setImageBitmap(null);
+                                    hideTextFields(false);
                                 })
                                 .show();
+
                     }
 
                 break;
@@ -481,5 +408,23 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
     @Override
     public void SetBitMapUri(Uri uri) {
         bitmapUri = uri;
+    }
+
+    @Override
+    public void SetCustomerKey(String key) {
+        txtCustomerKey.setText(key);
+    }
+
+    @Override
+    public void SetKeyWasSaved() {
+
+        btnGenerateQR.setVisibility(View.VISIBLE);
+        DoSnack(getString(R.string.txt_saving_customer_qr_to_database));
+
+    }
+
+    @Override
+    public void SetKeyWasNotSaved() {
+        btnGenerateQR.setVisibility(View.VISIBLE);
     }
 }

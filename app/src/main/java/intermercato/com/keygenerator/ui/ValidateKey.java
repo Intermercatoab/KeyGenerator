@@ -27,26 +27,22 @@ public class ValidateKey extends AppCompatActivity implements ScannerLiveView.Sc
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_validate_key);
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-
         // CHECK TO SEE THAT SCALE ID HAS BEEN SET
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                scannerLiveView.startScanner();
-            }
+        fab.setOnClickListener(view -> {
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            scannerLiveView.startScanner();
         });
+
         txtValid = findViewById(R.id.txtValid);
         scannerLiveView = findViewById(R.id.scanner);
         scannerLiveView.setScannerViewEventListener(this);
@@ -81,30 +77,24 @@ public class ValidateKey extends AppCompatActivity implements ScannerLiveView.Sc
     }
 
     private void validateData(String data) {
-
         String QrKey = data;
         String customerKey = "";
         String s = "\n\nKey is valid with scale id 886B0F69E0C5 ";
         try {
             String deansBase64 = AESEnDecryption.decryptStrAndFromBase64(DataHandler.IVSTR, "886B0F69E0C5", data);
             Log.d("Validate", "After Decrypt & From Base64: " + deansBase64);
-
             Log.d("Valida", "                                 ");
             customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, "886B0F69E0C5", deansBase64);
-
             Log.d("Validate", "QrKey: " + QrKey + "   ==   " + customerKey);
 
         } catch (Exception e) {
 
         }
+
         if (customerKey.toUpperCase().trim().equals(QrKey.trim().toUpperCase())) {
-
             txtValid.setText("CustomerKey\n\n" + customerKey + s);
-
         } else {
-
             txtValid.setText("Invalid key!");
-
         }
     }
 }

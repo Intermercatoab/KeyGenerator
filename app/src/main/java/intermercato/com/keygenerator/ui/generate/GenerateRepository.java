@@ -20,10 +20,15 @@ import intermercato.com.keygenerator.utils.QRCodeEncoder;
 
 public class GenerateRepository implements GenerateQrContract.Repository {
 
-    int width;
-    int height;
-    int smallerDimension;
-    GenerateQrContract.Presenter presenter;
+    private int width;
+    private int height;
+    private int smallerDimension;
+    private GenerateQrContract.Presenter presenter;
+    private String customerKey;
+    private Uri bitmapUri;
+    private String scaleId;
+    private String genKey;
+
 
     public GenerateRepository(GenerateQrContract.Presenter p) {
         presenter = p;
@@ -32,9 +37,9 @@ public class GenerateRepository implements GenerateQrContract.Repository {
     @Override
     public void GenerateQr(String strId) {
 
-        String genKey = "e6980bc3-7378-4e95-8e92-3ffd18a8a41d"; //generateKey();
-        String scaleId = strId;
-        String customerKey = "";
+        genKey = "e6980bc3-7378-4e95-8e92-3ffd18a8a41d"; //generateKey();
+        scaleId = strId;
+        customerKey = "";
         String errorMessage;
 
         Log.d("Generate", "genKey: " + genKey + "\nScaleId: " + scaleId + "IvStr: " + DataHandler.IVSTR);
@@ -57,6 +62,8 @@ public class GenerateRepository implements GenerateQrContract.Repository {
 
         if (width != 0 && height != 0)
             GenerateBitMapQrImage(customerKey);
+
+        presenter.returnCustomerKey(customerKey);
     }
 
     @Override
@@ -70,15 +77,16 @@ public class GenerateRepository implements GenerateQrContract.Repository {
         try {
             bitmap = qrCodeEncoder.encodeAsBitmap();
 
-            //qrImage.setImageBitmap(bitmap);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         presenter.returnBitmap(bitmap);
 
-        Uri bitmapUri = getImageUri(bitmap);
+        bitmapUri = getImageUri(bitmap);
+
         presenter.returnBitmapUri(bitmapUri);
+
+
     }
 
     @Override
@@ -88,9 +96,18 @@ public class GenerateRepository implements GenerateQrContract.Repository {
         height = h;
         smallerDimension = width < height ? width : height;
         smallerDimension = smallerDimension * 3 / 4;
-        Log.d("Generate", "w " + width + "   h " + height);
+        Log.d("Generate", "SetPoint w " + width + "   h " + height);
 
 
+    }
+
+    @Override
+    public void collectQrData(boolean b) {
+        if(b) {
+            presenter.doSaveQr(customerKey, bitmapUri.toString(), scaleId, genKey);
+        } else {
+            customerKey = ""; bitmapUri=null; scaleId=""; genKey = "";
+        }
     }
 
     public Uri getImageUri(Bitmap inImage) {

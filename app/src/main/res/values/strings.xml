@@ -12,4 +12,9 @@
     <string name="txt_save_customer_qr_msg">QR customer key will be saved to database.</string>
     <string name="txt_saving_customer_qr_to_database">Qr saved to database</string>
     <string name="txt_save_qr">Save qr</string>
+    <string name="txt_qr_didnt_get_saved">process was canceled</string>
+    <string name="txt_message_permissions_needed">permissions are needed</string>
+    <string name="txt_dialog_title_important">important</string>
+    <string name="txt_positive_button_title_ok">Yes</string>
+    <string name="txt_message_permissions_not_granted">Go to settings and enable permissions</string>
 </resources>
