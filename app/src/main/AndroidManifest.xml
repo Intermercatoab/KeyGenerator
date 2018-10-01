@@ -31,7 +31,7 @@
             android:label="@string/title_activity_generate_key"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".ui.ValidateKey"
+            android:name=".ui.validate.ValidateKey"
             android:label="@string/title_activity_validate_key"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity

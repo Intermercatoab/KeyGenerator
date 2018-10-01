@@ -106,7 +106,12 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
         realm = Realm.getDefaultInstance();
         RealmResults<CustomerKey> customerKeys = realm.where(CustomerKey.class).findAllAsync();
         listener = c -> {
-            Log.d("DataBase","size "+c.size());
+            for(CustomerKey ck : c) {
+                Log.d("DataBase", "size " +ck.getCreated());
+                Log.d("DataBase", "size " +ck.getCustomerKey());
+                Log.d("DataBase", "size " +ck.getScaleId());
+                Log.d("DataBase", "size " );
+            }
         };
 
 
@@ -224,12 +229,13 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
         }
     }
 
-
+    /* PRINT API RELATED */
     private String getMimeType(Uri uri) {
         Uri returnUri = uri;
         return getContentResolver().getType(returnUri);
     }
 
+    /* PRINT API RELATED */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -243,6 +249,7 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
         }
     }
 
+    /* PRINT API RELATED */
     private void showFileInfo(Uri uri) {
 
         Cursor returnCursor = getContentResolver().query(uri, null, null, null, null);
@@ -257,6 +264,7 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
 
     }
 
+    /* PRINT API RELATED */
     private String getContentMimeType() {
         String mimeType = MIME_TYPE_IMAGE;
 
@@ -322,6 +330,7 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
         super.onBackPressed();
     }
 
+    /* PRINT API RELATED */
     @Override
     public void onPrintMetricsDataPosted(PrintMetricsData printMetricsData) {
 

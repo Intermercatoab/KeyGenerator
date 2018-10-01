@@ -36,13 +36,13 @@ public class PermissionsCheckActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        /*prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Log.d("PermissionsCheck", "prefs displayInfo " + prefs.getBoolean("displayInfo", true));
         if (Build.VERSION.SDK_INT >= 23) {
             if (prefs.getBoolean("displayInfo", true)) {
                 showDialogOK(getString(R.string.txt_message_permissions_needed), dialogClickListener);
             }
-        }
+        }*/
     }
 
     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -125,8 +125,8 @@ public class PermissionsCheckActivity extends AppCompatActivity {
 
         }
 
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("displayInfo", false).apply();
+/*        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("displayInfo", false).apply();*/
 
 
 
@@ -137,7 +137,7 @@ public class PermissionsCheckActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        Log.d("Controller", "onRequestPermissionsResult");
+        Log.d("PERMISSIONSCHECK", "onRequestPermissionsResult");
         switch (requestCode) {
             case REQUEST_ID_MULTIPLE_PERMISSIONS: {
 
@@ -157,15 +157,15 @@ public class PermissionsCheckActivity extends AppCompatActivity {
                             && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                             && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
 
-                        Log.d("Controller", "ACCESS_COARSE_LOCATION ACCESS_FINE_LOCATION WRITE_EXTERNAL_STORAGE CAMERA permission granted");
+                        Log.d("PERMISSIONSCHECK", "ACCESS_COARSE_LOCATION ACCESS_FINE_LOCATION WRITE_EXTERNAL_STORAGE CAMERA permission granted");
                         // process the normal flow
                         //else any one or both the permissions are not granted
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean("displayInfo", false).apply();
+                      /*  SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("displayInfo", false).apply();*/
 
 
                     } else {
-                        Log.d("Controller", "Some permissions are not granted ask again ");
+                        Log.d("PERMISSIONSCHECK", "Some permissions are not granted ask again ");
                         //permission is denied (this is the first time, when "never ask again" is not checked) so ask again explaining the usage of permission
 //                        // shouldShowRequestPermissionRationale will return true
                         //show the dialog or snackbar saying its necessary and try again otherwise proceed with setup.

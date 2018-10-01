@@ -42,7 +42,7 @@ public class GenerateRepository implements GenerateQrContract.Repository {
         customerKey = "";
         String errorMessage;
 
-        Log.d("Generate", "genKey: " + genKey + "\nScaleId: " + scaleId + "IvStr: " + DataHandler.IVSTR);
+        Log.d("Generate", "genKey: " + genKey + "\nScaleId: " + scaleId + " 0IvStr: " + DataHandler.IVSTR);
 
         if (scaleId.length() < 2) {
             errorMessage = "Scale ID can't be empty or less that four characters";

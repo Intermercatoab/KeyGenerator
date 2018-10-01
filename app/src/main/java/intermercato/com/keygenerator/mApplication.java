@@ -2,6 +2,8 @@ package intermercato.com.keygenerator;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
+import android.os.StrictMode;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -27,6 +29,17 @@ public class mApplication extends Application {
         super.onCreate();
 
         instance = this;
+
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+        }
 
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
