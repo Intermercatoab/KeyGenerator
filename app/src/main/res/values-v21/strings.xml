@@ -1,0 +1,20 @@
+<resources>
+<!--    <string name="app_name">KeyGenerator</string>
+    <string name="title_activity_generate_key">GenerateKey</string>
+    <string name="title_activity_validate_key">ValidateKey</string>
+    <string name="txtAddScaleId">Add scale ID to generate customer key</string>
+    <string name="title_activity_storedkeys">Storedkeys</string>
+    <string name="title_customer_generated_key">Generated customer key</string>
+    <string name="print_settings">PRINT SETTINGS</string>
+    <string name="printing_help">PRINTING HELP</string>
+    <string name="txt_save_customer_qr">SAVE QR</string>
+    <string name="txt_generate_qr">GENERATE QR</string>
+    <string name="txt_save_customer_qr_msg">QR customer key will be saved to database.</string>
+    <string name="txt_saving_customer_qr_to_database">Qr saved to database</string>
+    <string name="txt_save_qr">Save qr</string>
+    <string name="txt_qr_didnt_get_saved">process was canceled</string>
+    <string name="txt_message_permissions_needed">permissions are needed</string>
+    <string name="txt_dialog_title_important">important</string>
+    <string name="txt_positive_button_title_ok">Yes</string>
+    <string name="txt_message_permissions_not_granted">Go to settings and enable permissions</string>-->
+</resources>

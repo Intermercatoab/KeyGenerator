@@ -29,7 +29,10 @@ public class MainActivity extends PermissionsCheckActivity implements View.OnCli
         findViewById(R.id.btnCreateKey).setOnClickListener(this);
         findViewById(R.id.btnValidate).setOnClickListener(this);
         findViewById(R.id.btnStoredKeys).setOnClickListener(this);
+        String str2=getString(R.string.app_name);
 
+
+        Log.d("Main","testStr locallib "+str2);
 
         String customerKey="";
         String genKey = "886B0F69E0C5";
