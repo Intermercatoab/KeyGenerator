@@ -5,8 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.StrictMode;
+
 import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,9 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.hp.mss.hpprint.activity.PrintPluginManagerActivity;
-import com.hp.mss.hpprint.model.PrintMetricsData;
-import com.hp.mss.hpprint.util.PrintUtil;
+
 
 import intermercato.com.keygenerator.ui.GenerateKey;
 import intermercato.com.keygenerator.ui.Storedkeys;
@@ -26,7 +23,7 @@ import static intermercato.com.keygenerator.ui.GenerateKey.CONTENT_TYPE_PDF;
 import static intermercato.com.keygenerator.ui.GenerateKey.MIME_TYPE_IMAGE;
 import static intermercato.com.keygenerator.ui.GenerateKey.MIME_TYPE_PDF;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class   MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
