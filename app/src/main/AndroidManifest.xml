@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
+        android:name=".mApplication"
         android:allowBackup="true"
         android:debuggable="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="HardcodedDebugMode">
+        tools:ignore="HardcodedDebugMode"
+        tools:replace="android:icon,android:theme,android:allowBackup">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,11 +28,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.GenerateKey"
+            android:name=".ui.generate.GenerateKey"
             android:label="@string/title_activity_generate_key"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".ui.ValidateKey"
+            android:name=".ui.validate.ValidateKey"
             android:label="@string/title_activity_validate_key"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KeyGenerator</string>
+<!--    <string name="app_name">KeyGenerator</string>
     <string name="title_activity_generate_key">GenerateKey</string>
     <string name="title_activity_validate_key">ValidateKey</string>
     <string name="txtAddScaleId">Add scale ID to generate customer key</string>
@@ -16,5 +16,5 @@
     <string name="txt_message_permissions_needed">permissions are needed</string>
     <string name="txt_dialog_title_important">important</string>
     <string name="txt_positive_button_title_ok">Yes</string>
-    <string name="txt_message_permissions_not_granted">Go to settings and enable permissions</string>
+    <string name="txt_message_permissions_not_granted">Go to settings and enable permissions</string>-->
 </resources>

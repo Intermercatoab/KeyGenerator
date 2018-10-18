@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'realm-android'
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -37,4 +37,5 @@ dependencies {
     implementation(name: 'mobileprintsdk', ext: 'aar')
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.mcxiaoke.volley:library:1.0.6'
+    implementation 'io.realm:android-adapters:2.1.1'
 }

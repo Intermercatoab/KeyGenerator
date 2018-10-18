@@ -15,14 +15,22 @@
         app:layout_constraintGuide_begin="20dp"
         app:layout_constraintGuide_percent="0.5" />
 
+    <TextView
+        android:id="@+id/txt_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#000"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/scanner"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <eu.livotov.labs.android.camview.ScannerLiveView
         android:id="@+id/scanner"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/guideView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,6 +48,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideView" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/loweGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvValidate"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scrollbars="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/loweGuide"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>
