@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.View;
 
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import intermercato.com.keygenerator.ui.PermissionsCheckActivity;
 import intermercato.com.keygenerator.ui.Storedkeys;
 import intermercato.com.keygenerator.ui.generate.GenerateKey;
@@ -56,6 +59,32 @@ public class MainActivity extends PermissionsCheckActivity implements View.OnCli
         } catch (Exception e) {
 
         }
+
+        String string_to_be_converted_to_MD5 = "65b80";
+        String MD5_Hash_String = md5(string_to_be_converted_to_MD5);
+        Log.d("md5","1  "+ MD5_Hash_String);
+        Log.d("md5","2   "+ md5(string_to_be_converted_to_MD5));
+        Log.d("md5","3   "+ md5("65b80"));
+
+    }
+
+    public String md5(String s) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0; i<messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+
+            return hexString.toString();
+        }catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     @Override
