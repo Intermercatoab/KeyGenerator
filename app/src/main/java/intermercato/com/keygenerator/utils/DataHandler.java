@@ -8,4 +8,5 @@ public class DataHandler {
 
 
     public static final String IVSTR = "INTERMERCATO";
+    public static final String KEYSTR = "e6980bc3";
 }

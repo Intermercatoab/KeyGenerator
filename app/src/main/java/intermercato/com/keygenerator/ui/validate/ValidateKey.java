@@ -146,10 +146,10 @@ public class ValidateKey extends AppCompatActivity implements ScannerLiveView.Sc
 
         try {
 
-            String deansBase64 = AESEnDecryption.decryptStrAndFromBase64(DataHandler.IVSTR, getScaleId(), QrKey);
+            String deansBase64 = AESEnDecryption.decryptStrAndFromBase64(DataHandler.IVSTR, DataHandler.KEYSTR, QrKey);
             Log.d("Validate", "After Decrypt & From Base64: " + deansBase64);
             Log.d("Valida", "                                 ");
-            customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, getScaleId(), deansBase64);
+            customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, DataHandler.KEYSTR, deansBase64);
             Log.d("Validate", "QrKey: " + QrKey + "   ==   " + customerKey);
 
         } catch (Exception e) {

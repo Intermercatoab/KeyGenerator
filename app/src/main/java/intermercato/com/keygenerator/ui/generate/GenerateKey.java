@@ -367,14 +367,14 @@ public class GenerateKey extends AppCompatActivity implements GenerateQrContract
                                     presenter.doAskUserBeforeSaving(true);
                                     v.setTag(null);
 
-                                    qrImage.setImageBitmap(null);
-                                    hideTextFields(false);
+                                    //qrImage.setImageBitmap(null);
+                                    //hideTextFields(false);
                                 })
                                 .setNegativeButton("NO", (dialog, which) -> {
                                     v.setTag(null);
                                     DoSnack(getString(R.string.txt_qr_didnt_get_saved));
-                                    qrImage.setImageBitmap(null);
-                                    hideTextFields(false);
+                                    //qrImage.setImageBitmap(null);
+                                    //hideTextFields(false);
                                 })
                                 .show();
 

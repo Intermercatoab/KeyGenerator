@@ -28,6 +28,7 @@ public class DatabaseRepository implements GenerateQrContract.RealmRepository{
                 c.setCustomerKey(cKey);
                 c.setCreated(mTime.getCurrentTime("yyyy/MM/dd HH:mm:ss"));
                 c.setScaleId(scaleId);
+                c.setKey(genKey);
 
             },() -> {
 

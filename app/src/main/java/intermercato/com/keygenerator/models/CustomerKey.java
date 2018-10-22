@@ -9,6 +9,16 @@ public class CustomerKey extends RealmObject {
     String id;
     String customerKey;
     String scaleId;
+    String key;
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     String created;
 
     public String getId() {

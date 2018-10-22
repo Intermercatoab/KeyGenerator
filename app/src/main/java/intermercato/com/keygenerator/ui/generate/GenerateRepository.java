@@ -37,8 +37,8 @@ public class GenerateRepository implements GenerateQrContract.Repository {
     @Override
     public void GenerateQr(String strId) {
 
-        genKey = "e6980bc3-7378-4e95-8e92-3ffd18a8a41d"; //generateKey();
-        scaleId = strId;
+        genKey = strId; //generateKey();
+        scaleId = "e6980bc3"; //e6980bc3-7378-4e95-8e92-3ffd18a8a41d
         customerKey = "";
         String errorMessage;
 
@@ -53,7 +53,7 @@ public class GenerateRepository implements GenerateQrContract.Repository {
         try {
             // ENCRYPT KEY
             Log.d("Generate", "Before Encrypt: " + genKey);
-            customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, scaleId, genKey);
+            customerKey = AESEnDecryption.encryptStrAndToBase64(DataHandler.IVSTR, DataHandler.KEYSTR, genKey);
             Log.d("Generate", "After Encrypt: " + customerKey);
 
         } catch (Exception e) {
