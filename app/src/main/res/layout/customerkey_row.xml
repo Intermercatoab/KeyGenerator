@@ -11,9 +11,7 @@
         android:id="@+id/txt_created"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:textColor="@color/white"
         android:textSize="@dimen/txt_size"
         app:layout_constraintBottom_toTopOf="@+id/txt_customerkey"
@@ -23,41 +21,39 @@
         tools:text="created: " />
 
     <TextView
+        android:id="@+id/txt_key"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/txt_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_scaleid"
+        tools:text="key: " />
+
+    <TextView
         android:id="@+id/txt_customerkey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:textColor="@color/white"
         android:textSize="@dimen/txt_size"
         app:layout_constraintBottom_toTopOf="@+id/txt_scaleid"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_created"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:text="customerKey: " />
 
     <TextView
         android:id="@+id/txt_scaleid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:textColor="@color/white"
         android:textSize="@dimen/txt_size"
-        app:layout_constraintBottom_toBottomOf="@+id/txt_key"
+        app:layout_constraintBottom_toTopOf="@+id/txt_key"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_customerkey"
         tools:text="scaleId: " />
-
-    <TextView
-        android:id="@+id/txt_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="@color/white"
-        android:textSize="@dimen/txt_size"
-        app:layout_constraintBottom_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_scaleid"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="key: " />
 
 </android.support.constraint.ConstraintLayout>

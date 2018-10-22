@@ -36,6 +36,6 @@ public class GenerateQrContract {
     }
 
     public interface RealmRepository {
-        void saveCustomer(String cKey, String cBitMapUri, String scaleId, String genKey);
+        void saveCustomer(String cKey, String cBitMapUri,  String genKey, String scaleId);
     }
 }

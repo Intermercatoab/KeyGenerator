@@ -104,7 +104,7 @@ public class GenerateRepository implements GenerateQrContract.Repository {
     @Override
     public void collectQrData(boolean b) {
         if(b) {
-            presenter.doSaveQr(customerKey, bitmapUri.toString(), scaleId, genKey);
+            presenter.doSaveQr(customerKey, bitmapUri.toString(), genKey, scaleId);
         } else {
             customerKey = ""; bitmapUri=null; scaleId=""; genKey = "";
         }
